@@ -26,7 +26,7 @@ Depending of the backend storage you planning to use, you may need to install ad
 * `mysqldb <https://pypi.org/project/mysqlclient/>`_
   (``sudo apt-get install python3-mysqldb`` on debian like systems) for the mysql backend.
 * `psycopg2 <https://pypi.python.org/pypi/psycopg2>`_
-  (``sudo apt-get install python3-psycopg2`` on debian like systems) fot the postgresql backend
+  (``sudo apt-get install python3-psycopg2`` on debian like systems) for the postgresql backend
 
 Install with pip::
 
