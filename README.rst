@@ -78,7 +78,7 @@ The ``.yaml`` are the new configuration format using the YAML syntax.
 * ``user``: The user ``policyd-rate-limit`` will use to drop privileges.
   The default is ``"policyd-rate-limit"``.
 * ``group``: The group ``policyd-rate-limit`` will use to drop privileges.
-  The defaut is ``"policyd-rate-limit"``.
+  The default is ``"policyd-rate-limit"``.
 * ``pidfile``: path where the program will try to write its pid to.
   The default is ``"/var/run/policyd-rate-limit/policyd-rate-limit.pid"``.
   ``policyd-rate-limit`` will try to create the parent directory and chown it if it do not exists.
@@ -100,7 +100,7 @@ The ``.yaml`` are the new configuration format using the YAML syntax.
   Ids are sasl usernames or ip addresses. The default is ``{}``.
 * ``limit_by_sasl``: Apply limits by sasl usernames. The default is ``True``.
 * ``limit_by_sender``: Apply limits by sender addresses if sasl username is not found.
-  The defaut is ``False``.
+  The default is ``False``.
 * ``limit_by_ip``: Apply limits by ip addresses if sasl username and sender address are not found.
   The default is ``False``.
 * ``limited_networks``: A list of ip networks in cidr notation on which limits are applied. An empty
