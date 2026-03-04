@@ -1,5 +1,4 @@
 .PHONY: clean build install dist uninstall
-VERSION=`python3 setup.py -V`
 
 WHL_FILES := $(wildcard dist/*.whl)
 WHL_ASC := $(WHL_FILES:=.asc)
@@ -10,24 +9,29 @@ build:
 	python3 setup.py build
 
 install: dist
-	pip3 -V
-	[ ! -f /etc/policyd-rate-limit.yaml ] && cp -n policyd_rate_limit/policyd-rate-limit.yaml /etc/ || true
-	cp -n init/policyd-rate-limit /etc/init.d
-	cp -n init/policyd-rate-limit.service /etc/systemd/system/ || true
-	cp -n init/policyd-rate-limit-clean.service /etc/systemd/system/policyd-rate-limit-clean.service
-	cp -n init/policyd-rate-limit-clean.timer /etc/systemd/system/policyd-rate-limit-clean.timer
-	pip3 install policyd-rate-limit --no-cache-dir -U --force-reinstall --no-deps --no-binary :all -f ./dist/policyd-rate-limit-${VERSION}.tar.gz
-	systemctl daemon-reload
-	systemctl enable policyd-rate-limit-clean.timer
-	systemctl start policyd-rate-limit-clean.timer
+	pkill -9 -f '^/usr/local/bin/policyd-rate-limit' || true
+	pipx install --global . --force
+	if [ -f /etc/systemd/system/policyd-rate-limit.service ]; then \
+		echo "Systemd service files exit, starting services..."; \
+		systemctl enable --now policyd-rate-limit && systemctl enable --now policyd-rate-limit-clean; \
+	fi
+
 uninstall:
-	pip3 uninstall policyd-rate-limit || true
+	pkill -9 -f '^/usr/local/bin/policyd-rate-limit' || true
+	pipx uninstall --global policyd-rate-limit || true
+	if [ -f /etc/systemd/system/policyd-rate-limit.service ]; then \
+		echo "Systemd service files exit, disabling services..."; \
+		systemctl disable --now policyd-rate-limit && systemctl disable --now policyd-rate-limit-clean; \
+	fi
+
 reinstall: uninstall install
+
 purge: uninstall
 	rm -f /etc/policyd-rate-limit.conf /etc/policyd-rate-limit.yaml
 	rm -f /etc/init.d/policyd-rate-limit /etc/systemd/system/policyd-rate-limit.service
 	rm -f /etc/systemd/system/policyd-rate-limit-clean.service /etc/systemd/system/policyd-rate-limit-clean.timer
 	rm -rf /var/lib/policyd-rate-limit/
+	systemctl daemon-reload
 
 clean_pyc:
 	find ./ -name '*.pyc' -delete

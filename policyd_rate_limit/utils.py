@@ -20,6 +20,7 @@ import pwd
 import grp
 import warnings
 import smtplib
+import shutil
 import yaml
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -95,6 +96,21 @@ class Config(object):
                     pass
         # if not config file found, raise en error
         else:
+
+            # if we are root, try to install the default config
+            if os.getuid() == 0:
+                print("Running as root, checking for system files...")
+                if not (os.path.isfile("/etc/policyd-rate-limit.yaml")):
+
+                    sys.stdout.write("No config files found, installing...\n")
+                    package_dir = os.path.dirname(os.path.abspath(__file__))
+                    try:
+                        shutil.copy(os.path.join(package_dir, "policyd-rate-limit.yaml"), "/etc/policyd-rate-limit.yaml")
+                        sys.stdout.write("Config file copied to /etc/policyd-rate-limit.yaml\n")
+                        exit(0)
+                    except OSError as e:
+                        sys.stderr.write("Error copying config file: %s\n" % e)
+                    
             sys.stderr.write(
                 "No config file found or bad permissions, searched for %s\n" % (
                     ", ".join(config_files),
@@ -361,7 +377,8 @@ def clean():
     finally:
         if config.backend == PGSQL_DB:
             cursor.get_db().autocommit = False
-
+        # Ensure database connection is properly closed
+        cursor.del_db()
 
 def gen_report(cur):
     cur.execute("SELECT id, delta, hit FROM limit_report")
@@ -601,6 +618,35 @@ def get_config(dotted_string):
     for param in params[1:]:
         obj = obj[param]
     return obj
+
+def install_system_services():
+    # if root
+    if os.getuid() == 0:
+        systemd_files = [
+            "/etc/init.d/policyd-rate-limit",
+            "/etc/systemd/system/policyd-rate-limit.service",
+            "/etc/systemd/system/policyd-rate-limit-clean.service",
+            "/etc/systemd/system/policyd-rate-limit-clean.timer"
+            ]
+
+        for file in systemd_files:
+            if not os.path.isfile(file):
+                #sys.stdout.write("%s not found, installing...\n" % file)
+                package_dir = os.path.dirname(os.path.abspath(__file__))
+                project_root = os.path.dirname(package_dir)
+                try:
+                    shutil.copy(os.path.join(project_root, "init", os.path.basename(file)), file)
+                    #sys.stdout.write("File %s copied\n" % file)
+                except OSError as e:
+                    sys.stderr.write("Error copying file %s: %s\n" % (file, e))
+        os.system("systemctl daemon-reload")
+        os.system("systemctl enable --now policyd-rate-limit")
+        os.system("systemctl enable --now policyd-rate-limit-clean")
+        sys.stdout.write("System files installation done\n")
+        sys.stdout.write("Policyd-rate-limit will now start as a systemd service\n")
+        exit(0)
+    else:
+        sys.stderr.write("You need to be root to install system files\n")
 
 
 def exit_signal_handler(signal, frame):

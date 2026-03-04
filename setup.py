@@ -50,6 +50,10 @@ setup(
         'policyd_rate_limit': [
             'policyd-rate-limit.conf',
             'policyd-rate-limit.yaml',
+            '../init/policyd-rate-limit',
+            '../init/policyd-rate-limit.service',
+            '../init/policyd-rate-limit-clean.service',
+            '../init/policyd-rate-limit-clean.timer',
         ]
     },
     keywords=['Postfix', 'rate', 'limit', 'email'],

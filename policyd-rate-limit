@@ -28,7 +28,11 @@ if __name__ == "__main__":  # pragma: no branch
         metavar='PARAMETER_NAME'
     )
     parser.add_argument("--file", '-f', help="path to a config file", metavar='CONFIG_PATH')
+    parser.add_argument("--enable-services", help="enable systemd services after installation", action="store_true")
     args = parser.parse_args()
+    
+    if args.enable_services:
+        utils.install_system_services()
     try:
         if args.file:
             config.setup(args.file)

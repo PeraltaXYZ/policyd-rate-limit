@@ -28,26 +28,16 @@ Depending of the backend storage you planning to use, you may need to install ad
 * `psycopg2 <https://pypi.python.org/pypi/psycopg2>`_
   (``sudo apt-get install python3-psycopg2`` on debian like systems) fot the postgresql backend
 
-Install with pip::
+Install with pipx::
 
-    sudo pip3 install policyd-rate-limit
+    sudo pipx install --global git+https://github.com/PeraltaXYZ/policyd-rate-limit.git
 
 or from source code::
 
     sudo make install
 
-This will install the ``policyd_rate_limit`` module, the ``policyd-rate-limit`` binary,
-copy the default config to ``/etc/policyd-rate-limit.conf`` if the file do not exists,
-copy an init script to ``/etc/init.d/policyd-rate-limit`` and an unit file to
-``/etc/systemd/system/policyd-rate-limit.service``.
-
-After the installation, you may need to run ``sudo systemctl daemon-reload`` for make the unit
-file visible by systemd.
-
-You should run ``policyd-rate-limit --clean`` on a regular basis to delete old records from the
-database. It could be wise to put it in a daily cron, for example::
-
-    0 0 * * * policyd-rate-limit /usr/local/bin/policyd-rate-limit --clean >/dev/null
+This will install the ``policyd-rate-limit`` binary.
+On first run, it will copy the default config to ``/etc/policyd-rate-limit.conf`` if the file do not exists.
 
 
 Options of the ``policyd-rate-limit`` binary
@@ -57,6 +47,7 @@ Options of the ``policyd-rate-limit`` binary
 * ``--clean``: clean old records from the database
 * ``--get-config PARAMETER_NAME`` return the value of a config parameter
 * ``--file CONFIG_PATH``, ``-f CONFIG_PATH``: path to a config file
+* ``--enable-services``: enable systemd services after installation
 
 Settings
 --------
@@ -103,6 +94,7 @@ The ``.yaml`` are the new configuration format using the YAML syntax.
   The defaut is ``False``.
 * ``limit_by_ip``: Apply limits by ip addresses if sasl username and sender address are not found.
   The default is ``False``.
+* ``skip_same_domain``: If ``True``, skips count for emails from the same domain. The default is ``False``.
 * ``limited_networks``: A list of ip networks in cidr notation on which limits are applied. An empty
   list is equal to ``limit_by_ip = False``, put ``"0.0.0.0/0"`` and ``::/0`` for every ip addresses.
 * ``success_action``: If not limits are reach, which action postfix should do. The default is
