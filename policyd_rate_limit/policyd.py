@@ -283,6 +283,17 @@ class Policyd(object):
                     else:
                         raise Pass()
 
+                    # Skip counting if sender and recipient domains match (if enabled)
+                    if config.skip_same_domain and 'sender' in request and 'recipient' in request:
+                        sender_domain = request['sender'].split('@')[-1] if '@' in request['sender'] else ''
+                        recipient_domain = request['recipient'].split('@')[-1] if '@' in request['recipient'] else ''
+                        if sender_domain and sender_domain == recipient_domain:
+                            id = None
+                            if config.debug:
+                                sys.stderr.write("Skipping count: sender domain %r matches recipient domain\n" % (sender_domain))
+                                sys.stderr.flush()
+                            raise Pass()
+
                     if request['protocol_state'].upper() == "RCPT":
                         recipient_count = 1
                     elif request['protocol_state'].upper() == "DATA":

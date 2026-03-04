@@ -56,6 +56,9 @@ limit_by_sasl = True
 limit_by_sender = False
 limit_by_ip = False
 
+# if True, skip rate limiting when sender and recipient domains match (internal emails)
+skip_same_domain = False
+
 limited_networks = []
 
 # actions return to postfix, see http://www.postfix.org/access.5.html for a list of actions.

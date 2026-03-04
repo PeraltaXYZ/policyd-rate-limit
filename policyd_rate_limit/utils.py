@@ -15,7 +15,7 @@ import threading
 import collections
 import ipaddress
 import time
-import imp
+import importlib.util
 import pwd
 import grp
 import warnings
@@ -63,7 +63,10 @@ class Config(object):
                 try:
                     # compatibility with old config style in a python module
                     if config_file.endswith(".conf"):  # pragma: no cover (deprecated)
-                        self._config = imp.load_source('config', config_file)
+                        spec = importlib.util.spec_from_file_location('config', config_file)
+                        module = importlib.util.module_from_spec(spec)
+                        spec.loader.exec_module(module)
+                        self._config = module
                         warnings.warn(
                             (
                                 "New configuration use a .yaml file. "
@@ -71,7 +74,7 @@ class Config(object):
                             ),
                             stacklevel=3
                         )
-                        cache_file = imp.cache_from_source(config_file)
+                        cache_file = importlib.util.cache_from_source(config_file)
                         # remove the config pyc file
                         try:
                             os.remove(cache_file)

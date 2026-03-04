@@ -37,14 +37,14 @@ else:
 
 setup(
     name='policyd-rate-limit',
-    version='1.2.0',
+    version='1.3.0',
     description=DESC,
     long_description=README,
     author='Valentin Samir',
     author_email='valentin.samir@crans.org',
     license='GPLv3',
-    url='https://github.com/nitmir/policyd-rate-limit',
-    download_url="https://github.com/nitmir/policyd-rate-limit/releases/latest",
+    url='https://github.com/PeraltaXYZ/policyd-rate-limit',
+    download_url="https://github.com/PeraltaXYZ/policyd-rate-limit/releases/latest",
     packages=['policyd_rate_limit', 'policyd_rate_limit.tests'],
     package_data={
         'policyd_rate_limit': [
